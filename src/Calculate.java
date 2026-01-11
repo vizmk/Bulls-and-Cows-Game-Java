@@ -26,4 +26,43 @@ public class Calculate {
             System.out.println("Grade: " + cows + " cow(s). The secret code is 9305.");
         }
     }
+
+    public String randomSecret(int length) {
+
+        boolean[] used = new boolean[10];
+        StringBuilder sb = new StringBuilder();
+
+        while (sb.length() < length) {
+
+            long pseudoRandomNumber = System.nanoTime();
+            String number = Long.toString(pseudoRandomNumber);
+
+            for (int i = number.length() - 1; i >= 0; i--) {
+
+                int digit = Character.getNumericValue(number.charAt(i));
+
+                if (digit < 0 || digit > 9) {
+                    continue;
+                }
+
+                if (used[digit]) {
+                    continue;
+                }
+
+                if (sb.length() == 0 && digit == 0) {
+                    continue;
+                }
+
+                sb.append(digit);
+                used[digit] = true;
+
+                if (sb.length() == length) {
+                    break;
+                }
+            }
+        }
+
+        return sb.toString();
+    }
+
 }
