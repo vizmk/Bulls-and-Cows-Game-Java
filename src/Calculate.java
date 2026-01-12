@@ -1,13 +1,18 @@
 public class Calculate {
 
-    private String secret = "9305";
-    private int bulls = 0;
-    private int cows = 0;
+    private String secret;
+    private int bulls;
+    private int cows;
 
-    public void validator(String guess) {
+    public void generateSecret(int length) {
+        secret = randomSecret(length);
+    }
 
-        // calcolo bulls e cows
-        for (int i = 0; i < guess.length(); i++) {
+    public void evaluateGuess(String guess) {
+        bulls = 0;
+        cows = 0;
+
+        for (int i = 0; i < secret.length(); i++) {
             if (guess.charAt(i) == secret.charAt(i)) {
                 bulls++;
             } else if (secret.contains(String.valueOf(guess.charAt(i)))) {
@@ -15,54 +20,35 @@ public class Calculate {
             }
         }
 
-        // stampe (UNA SOLA VIENE ESEGUITA)
         if (bulls == 0 && cows == 0) {
-            System.out.println("Grade: None. The secret code is 9305.");
-        } else if (bulls > 0 && cows > 0) {
-            System.out.println("Grade: " + bulls + " bull(s) and " + cows + " cow(s). The secret code is 9305.");
-        } else if (bulls > 0) {
-            System.out.println("Grade: " + bulls + " bull(s). The secret code is 9305.");
+            System.out.println("Grade: None");
+        } else if (bulls > 0 && cows == 0) {
+            System.out.println(bulls == 1 ? "Grade: 1 bull" : "Grade: " + bulls + " bulls");
+        } else if (bulls == 0 && cows > 0) {
+            System.out.println(cows == 1 ? "Grade: 1 cow" : "Grade: " + cows + " cows");
         } else {
-            System.out.println("Grade: " + cows + " cow(s). The secret code is 9305.");
+            System.out.println("Grade: " + bulls + " bulls and " + cows + " cows");
         }
     }
 
-    public String randomSecret(int length) {
+    public int getBulls() {
+        return bulls;
+    }
 
+    private String randomSecret(int length) {
         boolean[] used = new boolean[10];
         StringBuilder sb = new StringBuilder();
 
         while (sb.length() < length) {
+            int digit = (int) (Math.random() * 10);
 
-            long pseudoRandomNumber = System.nanoTime();
-            String number = Long.toString(pseudoRandomNumber);
+            if (sb.length() == 0 && digit == 0) continue; // no leading zero
+            if (used[digit]) continue;
 
-            for (int i = number.length() - 1; i >= 0; i--) {
-
-                int digit = Character.getNumericValue(number.charAt(i));
-
-                if (digit < 0 || digit > 9) {
-                    continue;
-                }
-
-                if (used[digit]) {
-                    continue;
-                }
-
-                if (sb.length() == 0 && digit == 0) {
-                    continue;
-                }
-
-                sb.append(digit);
-                used[digit] = true;
-
-                if (sb.length() == length) {
-                    break;
-                }
-            }
+            used[digit] = true;
+            sb.append(digit);
         }
 
         return sb.toString();
     }
-
 }
