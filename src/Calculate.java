@@ -11,13 +11,13 @@ public class Calculate {
     private int cows = 0;
 
     private int possibleSymbols = 0;
+    private String pool = "";
 
     public void generateSecret(int length, int possibleSymbols) {
         this.possibleSymbols = possibleSymbols;
+        this.pool = ALPHABET.substring(0, possibleSymbols);
 
-        String pool = ALPHABET.substring(0, possibleSymbols);
-
-        // Shuffle pool characters, then take first 'length' => guaranteed unique
+        // Shuffle pool chars and take first "length" -> unique by construction
         List<Character> chars = new ArrayList<>();
         for (int i = 0; i < pool.length(); i++) {
             chars.add(pool.charAt(i));
@@ -28,38 +28,38 @@ public class Calculate {
         for (int i = 0; i < length; i++) {
             sb.append(chars.get(i));
         }
-
         secret = sb.toString();
     }
 
     public String getPreparedLine() {
         StringBuilder stars = new StringBuilder();
-        for (int i = 0; i < secret.length(); i++) {
-            stars.append('*');
-        }
+        for (int i = 0; i < secret.length(); i++) stars.append('*');
 
-        String pool = ALPHABET.substring(0, possibleSymbols);
         char last = pool.charAt(pool.length() - 1);
 
         String range;
         if (possibleSymbols <= 10) {
-            // 0-<last digit>
             range = "(0-" + last + ")";
         } else {
-            // 0-9, a-<last letter>
             range = "(0-9, a-" + last + ")";
         }
 
         return "The secret is prepared: " + stars + " " + range + ".";
     }
 
+    public boolean isGuessValid(String guess) {
+        // Every char in guess must be inside the allowed pool
+        for (int i = 0; i < guess.length(); i++) {
+            if (pool.indexOf(guess.charAt(i)) < 0) return false;
+        }
+        return true;
+    }
+
     public String evaluateGuess(String guess) {
         bulls = 0;
         cows = 0;
 
-        int n = Math.min(guess.length(), secret.length());
-
-        for (int i = 0; i < n; i++) {
+        for (int i = 0; i < secret.length(); i++) {
             char g = guess.charAt(i);
             char s = secret.charAt(i);
 
@@ -74,21 +74,16 @@ public class Calculate {
     }
 
     private String formatGrade(int bulls, int cows) {
-        if (bulls == 0 && cows == 0) {
-            return "Grade: None";
-        }
+        if (bulls == 0 && cows == 0) return "Grade: None";
 
         StringBuilder sb = new StringBuilder("Grade: ");
 
-        boolean wrote = false;
-
         if (bulls > 0) {
             sb.append(bulls).append(bulls == 1 ? " bull" : " bulls");
-            wrote = true;
         }
 
         if (cows > 0) {
-            if (wrote) sb.append(" and ");
+            if (bulls > 0) sb.append(" and ");
             sb.append(cows).append(cows == 1 ? " cow" : " cows");
         }
 
